@@ -1,0 +1,26 @@
+{
+  "name": "simple_http",
+  "version": "1.0.0",
+  "keywords": [
+    "util",
+    "functional",
+    "server",
+    "client",
+    "browser"
+  ],
+  "author": "0trebor0",
+  "contributors": [],
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "http": "0.0.0",
+    "mime-types": "^2.1.21",
+    "url": "^0.11.0"
+  },
+  "main": "main.js",
+  "devDependencies": {},
+  "scripts": {
+    "start": "node main.js"
+  },
+  "license": "ISC",
+  "description": "Simple HTTP Server"
+}

@@ -21,7 +21,7 @@ server.watch( "/", home );
 
     home = ()=>{
 
-        server.send( "HELLO" )
+        server.streamFile( "index.html");
     
     }
 

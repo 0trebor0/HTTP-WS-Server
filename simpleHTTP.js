@@ -24,23 +24,25 @@ module.exports = {
             this.docroot;
             this.watching = {};
             this.loadConfig( config );
+            this.response;
+            this.urlQuery;
             const server = http.createServer();
             server.listen(this.port);
             server.on('listening', ()=>{
                 this.greenColour("listening on port:"+this.port+" | docroot:"+this.docroot);
             });
-            this.urlQuery;
             server.on('request', ( req, res )=>{
-                this.parsedUrl = this.parseUrl( req );
+                this.parsedUrl = this.parseUrl( req , true);
                 this.urlQuery = this.parsedUrl.query;
+                this.response = res;
                 this.greenColour(req.connection.remoteAddress+" REQUEST:"+JSON.stringify(this.parsedUrl));
                 if( this.watching[this.parsedUrl.pathname] ){
-                    this.watching[this.parsedUrl.pathname]( res );
+                    this.watching[this.parsedUrl.pathname]();
                 } else if( this.docroot !== null || fs.existsSync( this.docroot+'/'+this.parsedUrl.pathname ) ){
-                    this.streamFile( res, this.parsedUrl.pathname );
+                    this.streamFile( this.parsedUrl.pathname );
                 }else{
                     this.redColour( "File: "+this.parsedUrl.pathname+" not found" );
-                    this.notFoundError( res, this.parsedUrl.pathname );
+                    this.notFoundError( this.parsedUrl.pathname );
                 }
             });
         }catch(error){
@@ -74,51 +76,51 @@ module.exports = {
             console.log("Port not set \r\n Using default port:8000");
         }
     },
-    watchForFile:function( file, name ){
+    watch:function( file, name ){
         this.watching[file] = name;
     },
-    send:function( res, file ){
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write( file );
-        res.end();
+    send:function( file ){
+        this.response.writeHead(200, {'Content-Type': 'text/html'});
+        this.response.write( file );
+        this.response.end();
     },
-    streamFile:function( res, file ){
+    streamFile:function( file ){
         try{
             if( fs.existsSync(this.docroot+file) ){
                 if( fs.statSync(this.docroot+file).isFile() ){
-                    res.writeHead(200, {'Content-Type': mime.lookup(this.docroot+file) });
+                    this.response.writeHead(200, {'Content-Type': mime.lookup(this.docroot+file) });
                     this.fileStream = fs.createReadStream( this.docroot+file );
-                    this.fileStream.pipe( res );
+                    this.fileStream.pipe( this.response );
                     this.fileStream.on('close', ()=>{
-                        res.end();
+                        this.response.end();
                     });
                 }else{
                     this.notFoundError( res, file );
                 }
             }else{
                 this.redColour( "File:"+file+" not found" );
-                this.notFoundError( res, file );
+                this.notFoundError( file );
             }
         }catch(err){
             this.redColour( err );
-            this.serverIternalServerError( res, err );
+            this.serverIternalServerError( err );
         }
     },
-    serverIternalServerError:function( res, error ){
-        res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write( "<center><h1>500 Internal Server Error<h1><p>"+error+"</p></center>" );
-        res.end();
+    serverIternalServerError:function( error ){
+        this.response.writeHead(500, {'Content-Type': 'text/html'});
+        this.response.write( "<center><h1>500 Internal Server Error<h1><p>"+error+"</p></center>" );
+        this.response.end();
     },
-    notFoundError:function( res, file){
-        res.writeHead(404, {'Content-Type': 'text/html'});
-        res.write( "<center><h1>404 Not Found</h1><p>"+file+" not found</p></center>" );
-        res.end();
+    notFoundError:function( file){
+        this.response.writeHead(404, {'Content-Type': 'text/html'});
+        this.response.write( "<center><h1>404 Not Found</h1><p>"+file+" not found</p></center>" );
+        this.response.end();
     },
     watchForQuery:function( query, name ){
         //this.watching[query] = name;
         console.log("Function Disabled");
     },
-    getQuery:function(){
+    query:function(){
         return this.urlQuery;
     }
 }

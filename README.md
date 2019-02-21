@@ -1,29 +1,29 @@
 # Simple-HTTP-Server
 
 # EXAMPLE 1
-
+```
 const server = require("./simplehttp.js");
-
 server.start({"port":"80","docroot":"./htdocs/"});
-
-home = ( res )=>{
-
-    server.streamFile( res, "index.html");
-    
+home = ()=>{
+    if( server.query().test){
+        server.send( "<center><h1>QUERY "+server.query().test+"</h1></center>" );
+    }else{
+        server.send("BAD");
+    }
 }
-
-server.watchForFile( "/", home );
-
+server.watch( "/", home );
+```
 # EXAMPLE 2
+```
+    const server = require("./simplehttp.js");
 
-const server = require("./simplehttp.js");
+    server.start({"port":"80","docroot":"./htdocs/"});
 
-server.start({"port":"80","docroot":"./htdocs/"});
+    home = ()=>{
 
-home = ( res )=>{
-
-    server.send( res, "HELLO" )
+        server.send( "HELLO" )
     
-}
+    }
 
-server.watchForFile( "/", home );
+server.watch( "/", home );
+```

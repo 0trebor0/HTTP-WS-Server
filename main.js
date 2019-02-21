@@ -15,9 +15,15 @@
  */
 const server = require("./simplehttp.js");
 server.start({"port":"80","docroot":"./htdocs/"});
-home = ( res )=>{
-    server.streamFile( res, "index.html");
+home = ()=>{
+    if( server.query().test){
+        server.send( "<center><h1>VALUE "+server.query().test+"</h1></center>" );
+    }else{
+        server.send("BAD");
+    }
 }
-server.watchForFile( "/", home );
-
-
+test = ()=>{
+    server.streamFile( "index.html");
+}
+server.watch( "/", home );
+server.watch( "/test", test );

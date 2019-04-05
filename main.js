@@ -18,7 +18,7 @@ server.start({"port":"80","docroot":"./htdocs/"});
 home = ()=>{
     //server.streamFile( res, "index.html");
     //server.send( res, "HEY" );
-    if( !server.getQuery("username") == false || !server.getQuery("email") ){
+    if( !server.getQuery("username") == false || !server.getQuery("email") == false){
         server.send( "<center>username:"+server.getQuery("username")+" email:"+server.getQuery("email")+"</center>" );
     }
 }

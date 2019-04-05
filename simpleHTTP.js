@@ -116,12 +116,12 @@ module.exports = {
         this.response.write( "<center><h1>404 Not Found</h1><p>"+file+" not found</p></center>" );
         this.response.end();
     },
-    watchForQuery:function( query, name ){
-        //this.watching[query] = name;
-        console.log("Function Disabled");
-    },
-    query:function(){
-        return this.urlQuery;
+    getQuery:function( id ){
+        if( this.urlQuery[id] ){
+            return this.urlQuery[id];
+        } else {
+            return false;
+        }
     }
 }
 

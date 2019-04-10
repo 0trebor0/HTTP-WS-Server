@@ -95,7 +95,7 @@ module.exports = {
                         this.response.end();
                     });
                 }else{
-                    this.notFoundError( res, file );
+                    this.notFoundError( file );
                 }
             }else{
                 this.redColour( "File:"+file+" not found" );

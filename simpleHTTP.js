@@ -36,14 +36,21 @@ module.exports = {
                 this.urlQuery = this.parsedUrl.query;
                 this.response = res;
                 this.greenColour(req.connection.remoteAddress+" REQUEST:"+JSON.stringify(this.parsedUrl));
-                if( this.watching[this.parsedUrl.pathname] ){
+				if( this.watching[this.parsedUrl.pathname] ){
                     this.watching[this.parsedUrl.pathname]();
-                } else if( this.docroot !== null || fs.existsSync( this.docroot+'/'+this.parsedUrl.pathname ) ){
-                    this.streamFile( this.parsedUrl.pathname );
-                }else{
-                    this.redColour( "File: "+this.parsedUrl.pathname+" not found" );
+                }else if( fs.existsSync( this.docroot+'/'+this.parsedUrl.pathname ) ){
+					this.fileStat = fs.statSync( this.docroot+'/'+this.parsedUrl.pathname );
+					if( this.fileStat.isDirectory() ){
+						if( fs.existsSync( this.docroot+'/'+this.parsedUrl.pathname+"/index.html" ) ){
+							this.streamFile( this.parsedUrl.pathname+"/index.html" );
+						}
+					} else {
+						this.streamFile( this.parsedUrl.pathname );
+					}
+				} else {
+					this.redColour( "File: "+this.parsedUrl.pathname+" not found" );
                     this.notFoundError( this.parsedUrl.pathname );
-                }
+				}
             });
         }catch(error){
             this.redColour( error );

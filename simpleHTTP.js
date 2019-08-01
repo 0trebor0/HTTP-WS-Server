@@ -39,17 +39,21 @@ module.exports = {
                 this.greenColour(req.connection.remoteAddress+" "+req.method+": "+req.url);
                 if( req.method === 'GET' ){
                     if( this.GET[ this.parsedUrl.pathname ] ){
-                        this.GET[ this.parsedUrl.pathname ]();
+                        this.GET[ this.parsedUrl.pathname ]( req, res );
                     } else {
-                        this.send("<head></head><body></body>");
+                        this.notFoundError( this.parsedUrl.pathname );
                     }
                 } else if( req.method === 'POST' ){
                     if( this.POST[ this.parsedUrl.pathname ] ){
-                        this.POST[ this.parsedUrl.pathname ]();
+                        this.POST[ this.parsedUrl.pathname ]( req, res );
+                    } else {
+                        this.notFoundError( this.parsedUrl.pathname );
                     }
                 } else {
                     if( this.GET[ this.parsedUrl.pathname ] ){
-                        this.GET[ this.parsedUrl.pathname ]();
+                        this.GET[ this.parsedUrl.pathname ]( req, res );
+                    } else {
+                        this.notFoundError( this.parsedUrl.pathname );
                     }
                 }
             });

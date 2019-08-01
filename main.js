@@ -20,5 +20,8 @@ server.get( "/", ()=>{
     //server.streamFile( "/home.html" );
 } );
 server.get( "/hello", ()=>{
-    server.send( "<h1>Im Hello</h1>" );
+    //server.send( "<h1>Im Hello</h1>" );
+    if( !server.query("username") == false || !server.query("email") == false){
+        server.send( "<center>username:"+server.query("username")+" email:"+server.query("email")+"</center>" );
+    }
 } );

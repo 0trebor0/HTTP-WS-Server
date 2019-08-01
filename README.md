@@ -5,7 +5,7 @@
 const server = require("./simplehttp.js");
 server.start({"port":"80","docroot":"./htdocs/"});
 home = ()=>{
-    if( !server.getQuery("username") == false || !server.getQuery("email") == false){
+    if( !server.query("username") == false || !server.getQuery("email") == false){
         server.send( "<center>username:"+server.getQuery("username")+" email:"+server.getQuery("email")+"</center>" );
     }
 }

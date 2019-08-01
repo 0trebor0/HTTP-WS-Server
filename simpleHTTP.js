@@ -41,10 +41,13 @@ module.exports = {
                 if( req.method === 'GET' ){
                     if( this.GET[ this.parsedUrl.pathname ] ){
                         this.GET[ this.parsedUrl.pathname ]( req, res );
-                    } else if( this.status === 'auto' || fs.existsSync( this.docroot+this.parsedUrl.pathname  ) ){
-                        console.log( this.docroot+this.parsedUrl.pathname );
-                        if( fs.statSync( this.docroot+this.parsedUrl.pathname ).isFile() ){
-                            this.streamFile( this.docroot+this.parsedUrl.pathname  );
+                    } else if( this.status === 'auto' ){
+                        if( fs.existsSync( this.docroot+this.parsedUrl.pathname  ) ){
+                            if( fs.statSync( this.docroot+this.parsedUrl.pathname ).isFile() ){
+                                this.streamFile( this.parsedUrl.pathname  );
+                            }
+                        } else {
+                            this.notFoundError( this.parsedUrl.pathname );
                         }
                     } else {
                         this.notFoundError( this.parsedUrl.pathname );

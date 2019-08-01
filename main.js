@@ -15,15 +15,6 @@
  */
 const server = require("./simplehttp.js");
 server.start({"port":"80","docroot":"./htdocs/"});
-home = ()=>{
-    //server.streamFile( res, "index.html");
-    //server.send( res, "HEY" );
-    if( !server.getQuery("username") == false || !server.getQuery("email") == false){
-        server.send( "<center>username:"+server.getQuery("username")+" email:"+server.getQuery("email")+"</center>" );
-    }
-}
-test = ()=>{
-    server.streamFile( "index.html");
-}
-server.watch( "/", home );
-server.watch( "/test", test );
+server.get( "/", ()=>{
+    server.send( "<h1>HELLO</h1>" );
+} );

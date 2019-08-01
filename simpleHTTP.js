@@ -22,7 +22,8 @@ module.exports = {
         try{
             this.port;
             this.docroot;
-            this.watching = {};
+            this.GET = {};
+            this.POST = {};
             this.loadConfig( config );
             this.response;
             this.urlQuery;
@@ -35,22 +36,22 @@ module.exports = {
                 this.parsedUrl = this.parseUrl( req , true);
                 this.urlQuery = this.parsedUrl.query;
                 this.response = res;
-                this.greenColour(req.connection.remoteAddress+" REQUEST:"+JSON.stringify(this.parsedUrl));
-				if( this.watching[this.parsedUrl.pathname] ){
-                    this.watching[this.parsedUrl.pathname]();
-                }else if( fs.existsSync( this.docroot+'/'+this.parsedUrl.pathname ) ){
-					this.fileStat = fs.statSync( this.docroot+'/'+this.parsedUrl.pathname );
-					if( this.fileStat.isDirectory() ){
-						if( fs.existsSync( this.docroot+'/'+this.parsedUrl.pathname+"/index.html" ) ){
-							this.streamFile( this.parsedUrl.pathname+"/index.html" );
-						}
-					} else {
-						this.streamFile( this.parsedUrl.pathname );
-					}
-				} else {
-					this.redColour( "File: "+this.parsedUrl.pathname+" not found" );
-                    this.notFoundError( this.parsedUrl.pathname );
-				}
+                this.greenColour(req.connection.remoteAddress+" "+req.method+": "+req.url);
+                if( req.method === 'GET' ){
+                    if( this.GET[ this.parsedUrl.pathname ] ){
+                        this.GET[ this.parsedUrl.pathname ]();
+                    } else {
+                        this.send("<head></head><body></body>");
+                    }
+                } else if( req.method === 'POST' ){
+                    if( this.POST[ this.parsedUrl.pathname ] ){
+                        this.POST[ this.parsedUrl.pathname ]();
+                    }
+                } else {
+                    if( this.GET[ this.parsedUrl.pathname ] ){
+                        this.GET[ this.parsedUrl.pathname ]();
+                    }
+                }
             });
         }catch(error){
             this.redColour( error );
@@ -83,8 +84,11 @@ module.exports = {
             console.log("Port not set \r\n Using default port:8000");
         }
     },
-    watch:function( file, name ){
-        this.watching[file] = name;
+    get:function( url, callback ){
+        this.GET[ url ] = callback;
+    },
+    post:function( url, callback ){
+        this.POST[ url ] = callback;
     },
     send:function( file ){
         this.response.writeHead(200, {'Content-Type': 'text/html'});
@@ -123,7 +127,7 @@ module.exports = {
         this.response.write( "<center><h1>404 Not Found</h1><p>"+file+" not found</p></center>" );
         this.response.end();
     },
-    getQuery:function( id ){
+    query:function( id ){
         if( this.urlQuery[id] ){
             return this.urlQuery[id];
         } else {

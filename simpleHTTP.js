@@ -26,6 +26,7 @@ module.exports = {
             this.POST = {};
             this.loadConfig( config );
             this.response;
+            this.status;
             this.urlQuery;
             const server = http.createServer();
             server.listen(this.port);
@@ -40,6 +41,11 @@ module.exports = {
                 if( req.method === 'GET' ){
                     if( this.GET[ this.parsedUrl.pathname ] ){
                         this.GET[ this.parsedUrl.pathname ]( req, res );
+                    } else if( this.status === 'auto' || fs.existsSync( this.docroot+this.parsedUrl.pathname  ) ){
+                        console.log( this.docroot+this.parsedUrl.pathname );
+                        if( fs.statSync( this.docroot+this.parsedUrl.pathname ).isFile() ){
+                            this.streamFile( this.docroot+this.parsedUrl.pathname  );
+                        }
                     } else {
                         this.notFoundError( this.parsedUrl.pathname );
                     }
@@ -49,7 +55,7 @@ module.exports = {
                     } else {
                         this.notFoundError( this.parsedUrl.pathname );
                     }
-                } else {
+                }  else {
                     if( this.GET[ this.parsedUrl.pathname ] ){
                         this.GET[ this.parsedUrl.pathname ]( req, res );
                     } else {
@@ -86,6 +92,11 @@ module.exports = {
         } else {
             this.port = 8000;
             console.log("Port not set \r\n Using default port:8000");
+        }
+        if( "status" in config ){
+            this.status = config.status;
+        } else {
+            this.status = null;
         }
     },
     get:function( url, callback ){

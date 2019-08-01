@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 const server = require("./simplehttp.js");
-server.start({"port":"80","docroot":"./htdocs/"});
+server.start({"port":"80","docroot":"./htdocs","status":"auto"});
 server.get( "/", ()=>{
     //server.send( "<h1>HELLO</h1>" );
     //server.streamFile( "/home.html" );

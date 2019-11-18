@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const server = require("./simplehttp.js");
+const server = require("./simpleHTTP.js");
 server.start({"port":"80","docroot":"./htdocs","status":"auto"});
 server.get( "/", ()=>{
     server.send( "<h1>HELLO</h1>" );

@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 const server = require("./simpleHTTP.js");
-server.start({"port":"80","docroot":"./htdocs","status":"auto"});
-server.get( "/", ()=>{
-    server.send( "<h1>HELLO</h1>" );
-    //server.streamFile( "/home.html" );
+server( {"port":80,"docroot":"./htdocs","ssl":{"cert":"./cert","key":"./key"},"websocket":{"origin":["http://localhost"]}} );
+server.get( '/', ( req, res )=>{
+    console.log( req.url.query );
+    res.json( {"type":"msg","msg":"hello"} );
 } );
-server.get( "/hello", ()=>{
-    //server.send( "<h1>Im Hello</h1>" );
-    if( !server.query("username") == false || !server.query("email") == false){
-        server.send( "<center>username:"+server.query("username")+" email:"+server.query("email")+"</center>" );
-    }
+server.post( '/', ( req, res, form )=>{
+    console.log( req.url.query );
+    //res.json( {"status":"hello"} );
+    console.log( form );
+} );
+server.websocket( '/', ( connection, req )=>{
+    console.log( "new connection" );
+    connection.on( 'message', ( message )=>{
+        console.log( message );
+    } );
 } );

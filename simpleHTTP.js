@@ -4,7 +4,8 @@ url = require('url'),
 fs = require('fs'),
 mime = require('mime-types'),
 WebSocket = require('ws'),
-formidable = require('formidable');
+formidable = require('formidable'),
+cookie = require('cookie');
 
 const app = {};
 app.port = 8080;
@@ -29,6 +30,10 @@ app.load = ( server )=>{
         server.on( 'request', ( req, res )=>{
             console.log( "["+req.connection.remoteAddress+"]["+req.method+"]"+req.url );
             req.url = url.parse( req.url, true );
+            if( req.headers.cookie ){
+                req.cookie = cookie.parse( req.headers.cookie );
+            }
+            res.cookieSerialize = cookie.serialize;
             res.file = ( filename )=>{
                 res.writeHead(200, {'Content-Type': mime.lookup( filename )});
                 let filestream = fs.createReadStream( filename );
@@ -72,9 +77,17 @@ app.load = ( server )=>{
             console.log( "websocket started on port: "+app.port );
             app.websocket.on( 'connection', ( connection, req )=>{
                 req.url = url.parse( req.url, true );
+                if( req.headers.cookie !== null ){
+                    req.cookie = cookie.parse( req.headers.cookie );
+                }
                 if( app.websocketAllowedOrigin[ req.headers.origin ] ){
-                    if( app.websocketConnection[ req.url.pathname ] ){
-                        app.websocketConnection[ req.url.pathname ]( connection, req );
+                    req.url.pathArray = req.url.pathname.split("/");
+                    req.url.pathArray.shift();
+                    if( req.url.pathArray[0] == '' ){
+                        req.url.pathArray = ['/'];
+                    }
+                    if( app.websocketConnection[ req.url.pathArray[0] ] ){
+                        app.websocketConnection[ req.url.pathArray[0] ]( connection, req );
                     } else {
                         console.log( "unwanted path connection "+req.connection.remoteAddress+" "+req.url.pathname );
                     }

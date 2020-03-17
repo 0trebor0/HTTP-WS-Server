@@ -36,7 +36,7 @@ app.load = ( server = null )=>{
             }
         } );
         app.server.on( 'request', ( req, res )=>{
-            console.log( "["+req.connection.remoteAddress+"]["+req.method+"]"+req.url );
+            console.log( "[http]["+req.connection.remoteAddress+"]["+req.method+"]"+req.url );
             req.url = url.parse( req.url, true );
             if( req.headers.cookie ){
                 req.cookie = cookie.parse( req.headers.cookie );
@@ -90,13 +90,8 @@ app.load = ( server = null )=>{
                     req.cookie = cookie.parse( req.headers.cookie );
                 }
                 if( app.websocketAllowedOrigin[ req.headers.origin ] ){
-                    req.url.pathArray = req.url.pathname.split("/");
-                    req.url.pathArray.shift();
-                    if( req.url.pathArray[0] == '' ){
-                        req.url.pathArray = ['/'];
-                    }
-                    if( app.websocketConnection[ req.url.pathArray[0] ] ){
-                        app.websocketConnection[ req.url.pathArray[0] ]( connection, req );
+                    if( app.websocketConnection[ req.url.pathname ] ){
+                        app.websocketConnection[ req.url.pathname ]( connection, req );
                     } else {
                         console.log( "unwanted path connection "+req.connection.remoteAddress+" "+req.url.pathname );
                     }

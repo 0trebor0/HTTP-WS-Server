@@ -17,17 +17,25 @@ app.websocket = null,
 app.websocketAllowedOrigin = null
 app.websocketConnection = {},
 app.post = {},
-app.load = ( server )=>{
+app.load = ( server = null )=>{
     try{
-        server.listen( app.port );
-        server.on( 'listening', ()=>{
+		if( app.ssl === null ){
+			app.server = http.createServer();
+		} else {
+			app.server = https.createServer( {
+				cert: fs.readFileSync( app.ssl.cert ),
+				key: fs.readFileSync( app.ssl.key )
+			} );
+		}
+        app.server.listen( app.port );
+        app.server.on( 'listening', ()=>{
             if( app.ssl === null ){
                 console.log( "http started on Port:"+app.port );
             } else {
                 console.log( "https started on Port:"+app.port );
             }
         } );
-        server.on( 'request', ( req, res )=>{
+        app.server.on( 'request', ( req, res )=>{
             console.log( "["+req.connection.remoteAddress+"]["+req.method+"]"+req.url );
             req.url = url.parse( req.url, true );
             if( req.headers.cookie ){
@@ -72,6 +80,7 @@ app.load = ( server )=>{
                 res.notfound();
             }
         });
+		server = app.server;
         if( app.websocketAllowedOrigin !== null ){
             app.websocket = new WebSocket.Server({ server });
             console.log( "websocket started on port: "+app.port );
@@ -101,14 +110,6 @@ app.load = ( server )=>{
         console.log( err );
     }
 }
-if( app.ssl === null ){
-    app.server = http.createServer();
-} else {
-    app.server = https.createServer( {
-        cert: app.ssl.cert,
-        key: app.ssl.key
-    } );
-}
 module.exports = ( config )=>{
     if( !fs.existsSync( './uploads' ) ){
         fs.mkdirSync( './uploads' );
@@ -132,7 +133,7 @@ module.exports = ( config )=>{
             app.websocketAllowedOrigin[ origin ] = "allowed";
         } );
     }
-    app.load( app.server );
+    app.load();
     return app.server;
 }
 module.exports.websocket = ( path, callback )=>{

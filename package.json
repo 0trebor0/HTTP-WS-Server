@@ -1,6 +1,6 @@
 {
   "name": "http_ws_server",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "keywords": [
     "util",
     "server",
@@ -21,7 +21,7 @@
     "url": "^0.11.0",
     "ws": "^7.2.3"
   },
-  "main": "main.js",
+  "main": "simpleHTTP.js",
   "devDependencies": {},
   "scripts": {
     "test": "Hello Test"

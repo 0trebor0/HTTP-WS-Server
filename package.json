@@ -1,6 +1,6 @@
 {
-  "name": "simple_http",
-  "version": "1.0.0",
+  "name": "http_ws_server",
+  "version": "1.0.1",
   "keywords": [
     "util",
     "functional",
@@ -26,5 +26,5 @@
     "start": "node main.js"
   },
   "license": "ISC",
-  "description": "Simple HTTP Server"
+  "description": "HTTP-WS-Server"
 }

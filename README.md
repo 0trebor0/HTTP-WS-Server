@@ -12,7 +12,7 @@
 const server = require("./simpleHTTP.js");
 server( {"port":80,"docroot":"./htdocs","ssl":{"cert":"./cert","key":"./key"},"websocket":{"origin":["http://localhost"]}} );
 server.get( '/', ( req, res )=>{
-    // console.log( req.url.query );
+    console.log( req.url.query );
     console.log( "cookie "+JSON.stringify(req.cookie) );
     res.setHeader('Set-Cookie', res.cookieSerialize('msg', String("HELLO"), {
         httpOnly: true,

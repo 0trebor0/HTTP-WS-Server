@@ -3,10 +3,8 @@
   "version": "1.0.3",
   "keywords": [
     "util",
-    "functional",
     "server",
-    "client",
-    "browser"
+    "websocket"
   ],
   "author": "0trebor0",
   "homepage": "https://github.com/0trebor0/HTTP-WS-Server",
@@ -28,6 +26,6 @@
   "scripts": {
     "test": "Hello Test"
   },
-  "license": "ISC",
+  "license": "MIT",
   "description": "HTTP-WS-Server"
 }

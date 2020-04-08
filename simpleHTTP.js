@@ -38,9 +38,9 @@ app.load = ( server = null )=>{
         app.server.on( 'request', ( req, res )=>{
             console.log( "[http]["+req.connection.remoteAddress+"]["+req.method+"]"+req.url );
             req.url = url.parse( req.url, true );
-            if( req.headers.cookie ){
-                req.cookie = cookie.parse( req.headers.cookie );
-            }
+            if( typeof req.headers.cookie !== 'undefined' ){
+		 req.cookie = cookie.parse( req.headers.cookie );
+	    }
             res.cookieSerialize = cookie.serialize;
             res.file = ( filename )=>{
                 res.writeHead(200, {'Content-Type': mime.lookup( filename )});

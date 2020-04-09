@@ -90,7 +90,7 @@ app.load = ( server = null )=>{
             app.websocket.on( 'connection', ( connection, req )=>{
                 console.log( "new websocket connection "+req.connection.remoteAddress+" "+req.url );
                 req.url = url.parse( req.url, true );
-                if( req.headers.cookie !== null ){
+                if( typeof req.headers.cookie !== 'undefined' ){
                     req.cookie = cookie.parse( req.headers.cookie );
                 }
                 if( app.websocketAllowedOrigin[ req.headers.origin ] ){

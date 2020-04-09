@@ -133,7 +133,7 @@ module.exports = ( config )=>{
         } );
     }
     app.load();
-    return app.server;
+    return {'http':app.server,'websocket':app.websocket};
 }
 module.exports.websocket = ( path, callback )=>{
     app.websocketConnection[ path ] = callback;

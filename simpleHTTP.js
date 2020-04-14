@@ -40,7 +40,9 @@ app.load = ( server = null )=>{
             req.url = url.parse( req.url, true );
             if( typeof req.headers.cookie !== 'undefined' ){
 				req.cookie = cookie.parse( req.headers.cookie );
-			}
+			} else {
+                req.cookie = {};
+            }
             res.cookieSerialize = cookie.serialize;
             res.file = ( filename )=>{
                 res.writeHead(200, {'Content-Type': mime.lookup( filename )});
@@ -92,6 +94,8 @@ app.load = ( server = null )=>{
                 req.url = url.parse( req.url, true );
                 if( typeof req.headers.cookie !== 'undefined' ){
                     req.cookie = cookie.parse( req.headers.cookie );
+                } else {
+                    req.cookie = {};
                 }
                 if( app.websocketAllowedOrigin[ req.headers.origin ] ){
                     if( app.websocketConnection[ req.url.pathname ] ){

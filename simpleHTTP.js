@@ -118,8 +118,16 @@ module.exports = (config = {})=>{
                 });
             } else if( app.method[ req.method ] && app.method[ req.method ][ req.url.pathname ] !== 'undefined' ){
                 app.method[ req.method ][ req.url.pathname ]( req, res );
-            } else if( app.htdocs !== null && fs.existsSync( app.htdocs+req.url.pathname ) && fs.statSync(app.htdocs+req.url.pathname).isFile() ){
-                res.file( app.htdocs+req.url.pathname );
+            } else if( app.htdocs !== null && fs.existsSync( app.htdocs+req.url.pathname ) ){
+                if( fs.statSync(app.htdocs+req.url.pathname).isFile() ){
+                    res.file( app.htdocs+req.url.pathname );
+                } else if( fs.statSync(app.htdocs+req.url.pathname).isDirectory() ){
+                    if( fs.existsSync( app.htdocs+req.url.pathname+"/index.html" ) ){
+                        res.file( app.htdocs+req.url.pathname+"/index.html" );
+                    } else {
+                        res.notfound();
+                    }
+                }
             } else {
                 res.notfound();
             }

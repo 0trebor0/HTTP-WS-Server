@@ -1,13 +1,13 @@
 {
   "name": "http_ws_server",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "keywords": [
     "util",
     "server",
     "websocket"
   ],
   "author": "0trebor0",
-  "homepage": "https://github.com/0trebor0/HTTP-WS-Server",
+  "homepage": "https://0trebor0.github.io/http_ws_server/",
   "bugs": "https://github.com/0trebor0/HTTP-WS-Server/issues",
   "repository": "0trebor0/HTTP-WS-Server",
   "contributors": [],

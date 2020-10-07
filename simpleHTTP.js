@@ -1,11 +1,10 @@
 const http = require('http'),
 https = require('https'),
-url = require('url'),
 fs = require('fs'),
-mime = require('mime-types'),
 WebSocket = require('ws'),
-formidable = require('formidable'),
-cookie = require('cookie');
+headers = require(__dirname+'/lib/headers.js'),
+reqJS = require(__dirname+'/lib/request.js'),
+formidable = require('formidable');
 var app = {};
 app.port = 8080;
 app.htdocs = null;
@@ -33,9 +32,6 @@ app.onconnect = ( path, callback )=>{
 
 module.exports = (config = {})=>{
     try{
-        if( !fs.existsSync( './uploads' ) ){
-            fs.mkdirSync( './uploads' );
-        }
         if( "port" in config ){
             app.port = config.port;
         }
@@ -85,38 +81,26 @@ module.exports = (config = {})=>{
             if( app.debug == true ){
                 console.log( "[HTTP][IpAddress"+req.connection.remoteAddress+"][Method: "+req.method+"]"+req.url );
             }
-            req.url = url.parse( req.url, true );
-            if( typeof req.headers.cookie !== 'undefined' ){
-                req.headers.cookie = cookie.parse( req.headers.cookie );
-            } else {
-                req.headers.cookie = {};
-            }
-            res.cookieSerialize = cookie.serialize;
-            res.json = ( d )=>{
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end( JSON.stringify( d ) );
-            };
-            res.notfound = ()=>{
-                res.writeHead(404, {'Content-Type': 'text/html'});
-                res.end();
-            };
-            res.file = ( filename )=>{
-                res.writeHead(200, {'Content-Type': mime.lookup( filename )});
-                let filestream = fs.createReadStream( filename );
-                filestream.pipe( res );
-                filestream.on( 'close', ()=>{
-                    res.end();
-                } );
-            };
-            if( req.method === 'GET' && app.method.get[ req.url.pathname ] ){
-                app.method.get[ req.url.pathname ]( req, res );
-            } else if( req.method === 'POST' && app.method.post[ req.url.pathname ] ){
-                let form = formidable({ multiples: true, uploadDir:'./uploads' });
-                form.parse(req, (err, fields, files) => {
-                    app.method.post[ req.url.pathname ]( req, res, {'fields':fields,'files':files} );
-                    //TODO: Add Timeout for uploaded file to auto delete
-                });
-            } else if( app.method[ req.method ] && app.method[ req.method ][ req.url.pathname ] !== 'undefined' ){
+            reqJS( req, res );
+            headers( req, res );
+            if( app.method[ req.method ] && app.method[ req.method ][ req.url.pathname ] ){
+                if( req.method == 'post' ){
+                    if( !fs.existsSync( './uploads' ) ){
+                        fs.mkdirSync( './uploads' );
+                    }
+                    let form = formidable({ multiples: true, uploadDir:'./uploads' });
+                    form.parse(req, (err, fields, files) => {
+                        setTimeout(()=>{
+                            //Delete File after 1 min
+                            for( t in files ){
+                                if( fs.existsSync( files[t].path ) ){
+                                    fs.unlinkSync( files[t].path );
+                                }
+                            }
+                        },60000);
+                        app.method[ req.method ][ req.url.pathname ]( req, res, {'fields':fields,'files':files} );
+                    });
+                }
                 app.method[ req.method ][ req.url.pathname ]( req, res );
             } else if( app.htdocs !== null && fs.existsSync( app.htdocs+req.url.pathname ) ){
                 if( fs.statSync(app.htdocs+req.url.pathname).isFile() ){
@@ -139,12 +123,8 @@ module.exports = (config = {})=>{
                 if( app.debug == true ){
                     console.log( "[NEW][WEBSOCKET]["+req.connection.remoteAddress+"]"+req.url );
                 }
-                req.url = url.parse( req.url, true );
-                if( typeof req.headers.cookie !== 'undefined' ){
-                    req.headers.cookie = cookie.parse( req.headers.cookie );
-                } else {
-                    req.headers.cookie = {};
-                }
+                reqJS( req );
+                headers( req );
                 if( app.originAllowed[req.headers.origin] && app.pathConnections[ req.url.pathname ] ){
                     if( app.debug == true ){
                         console.log( "[ACCEPTED][WEBSOCKET][IpAddress:"+req.connection.remoteAddress+"][ORIGIN: "+req.headers.origin+"][PATH: "+req.url.pathname+"]" );

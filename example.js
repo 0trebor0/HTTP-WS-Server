@@ -21,7 +21,8 @@ server.onconnect( '/', ( connection, req )=>{
         console.log( req.connection.remoteAddress+" left" );
     } );
 } );
-//
+
+//console.log(server);
 //app();
 //app.get( '/', ( req, res )=>{}
 //app.post( '/', ( req, res )=>{}

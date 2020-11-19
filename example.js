@@ -1,4 +1,4 @@
-const app = require("./simpleHTTP.js");
+const app = require("./lib/simpleHTTP.js");
 let server = app({"port":80,"docroot":"./uploads","ssl":{"cert":"./cert","key":"./key"},"websocket":{"origin":["http://localhost"]}});
 server.get( '/', ( req, res )=>{
     console.log( "cookie: "+JSON.stringify(req.headers.cookie) );
